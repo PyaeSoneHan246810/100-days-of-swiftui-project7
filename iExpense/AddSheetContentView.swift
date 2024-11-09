@@ -2,7 +2,7 @@ import SwiftUI
 
 struct AddSheetContentView: View {
     @Environment(\.dismiss) var dismiss
-    @State private var name: String = ""
+    @State private var name: String = "Enter Name"
     @State private var type: String = "Personal"
     @State private var amount: Double = 0.0
     var types: [String] = ["Personal", "Business"]
@@ -11,7 +11,6 @@ struct AddSheetContentView: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("Name", text: $name)
                     TextField("Amount", value: $amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
                         .keyboardType(.numberPad)
                     Picker("Type", selection: $type) {
@@ -24,14 +23,23 @@ struct AddSheetContentView: View {
             }
             .formStyle(.grouped)
             .listRowSpacing(12)
-            .navigationTitle("Add Expense")
+            .navigationTitle($name)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                Button("Save") {
-                    let expenseItem = ExpenseItem(name: name, type: type, amount: amount)
-                    expenses.items.append(expenseItem)
-                    dismiss()
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Save") {
+                        let expenseItem = ExpenseItem(name: name, type: type, amount: amount)
+                        expenses.items.append(expenseItem)
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
                 }
             }
+            
         }
     }
 }

@@ -3,35 +3,52 @@ import SwiftUI
 struct MainContentView: View {
     @State private var expenses: Expenses = Expenses()
     @State private var isAddExpensePresented: Bool = false
+    var personalExpenseItems: [ExpenseItem] {
+        expenses.items.filter { item in
+            item.type == "Personal"
+        }
+    }
+    var businessExpenseItems: [ExpenseItem] {
+        expenses.items.filter { item in
+            item.type == "Business"
+        }
+    }
     var body: some View {
         NavigationStack {
             List {
                 Section("Personal") {
-                    ForEach(expenses.items.filter { item in
-                        item.type == "Personal"
-                    }) { item in
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text(item.name)
-                                    .font(.headline.bold())
-                                Text(item.type)
-                                    .font(.body.weight(.medium))
+                    if personalExpenseItems.isEmpty {
+                        Text("Empty")
+                            .font(.body)
+                            .listRowSeparator(.hidden)
+                    } else {
+                        ForEach(personalExpenseItems) { item in
+                            HStack {
+                                VStack(alignment: .leading) {
+                                    Text(item.name)
+                                        .font(.headline.bold())
+                                    Text(item.type)
+                                        .font(.body.weight(.medium))
+                                }
+                                Spacer()
+                                Text(item.amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                                    .foregroundStyle(item.amount <= 1000 ? .green : item.amount <= 10000 ? .blue : .red
+                                    )
                             }
-                            Spacer()
-                            Text(item.amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
-                                .foregroundStyle(item.amount <= 1000 ? .green : item.amount <= 10000 ? .blue : .red
-                                )
                         }
+                        .onDelete { indexSet in
+                            removeItem(at: indexSet, for: "Personal")
+                        }
+                        .listRowSeparator(.hidden)
                     }
-                    .onDelete { indexSet in
-                        removeItem(at: indexSet, for: "Personal")
-                    }
-                    .listRowSeparator(.hidden)
                 }
                 Section("Business") {
-                    ForEach(expenses.items.filter { item in
-                        item.type == "Business"
-                    }) { item in
+                    if businessExpenseItems.isEmpty {
+                        Text("Empty")
+                            .font(.body)
+                            .listRowSeparator(.hidden)
+                    }
+                    ForEach(businessExpenseItems) { item in
                         HStack {
                             VStack(alignment: .leading) {
                                 Text(item.name)
